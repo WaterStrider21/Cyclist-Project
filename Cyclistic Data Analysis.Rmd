@@ -1,0 +1,124 @@
+---
+title: "Cyclistic Case Study"
+author: "WaterStrider21"
+date: "2022-11-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+##Introduction:
+
+This project will demonstrate the skils attained from the Coursera Google Data Analytics Course. Below I will follow the Data Analysis Process: ask, prepare, process, analyze,
+share, and act.
+
+#Objective:
+
+By the end of this comprehensive analysis, we can conclude how annual members and casual riders use Cyclistic bikes differently, how casual riders may be converted to annual members, and how we can use digital media to influence casual riders to become members.
+
+#Stakeholders:
+
+The key stakeholders include Lily Moreno (Marketing Director), the Marketing Analytics team and the Executive team who will approve of the final marketing strategy. 
+
+
+#Datasets:
+
+The analysis will use Excel spreadsheet data converted to .csv files  from November 2021 - October 2022. The spreadsheets have been cleaned and columns were added  to include the ride_length and the day_of_week that the members or casual riders rode bikes directly in Excel. 
+
+The data is reliable as it is directly from the company. The most current data was collected and used to complete the analysis.
+The data is unbiased but isn’t as comprehensive as it should be. It includes the locations, dates and times of riders without disclosing private information. However, there are some data missing - there are columns such as: start_station_name, start_station_id, end_station_name, and end_station_id that are left blank. This information is not vital to the analysis though it has been noted as incomplete.
+
+#Tools: 
+
+To complete the analysis, I will be using RConsole, RStudio and RMarkdown specifically.
+The packages needed to complete the project include: ‘tidyverse’, ‘ggplot2’, ‘here’, and ‘skimr’’. See below for the package installation guide:
+
+
+## Installing Packages and Reading the Data
+
+```{r}
+install.packages('tidyverse')
+library(tidyverse)
+install.packages('ggplot2')
+library(ggplot2)
+install.packages('here')
+library(here)
+install.packages('skimr')
+library(skimr)
+```
+
+##Loading the Data to RConsole
+
+```{r load data}
+Nov21 <-read.csv('202111-divvy-tripdata.csv')
+Dec21<-read.csv('202112-divvy-tripdata.csv')
+Jan22<-read.csv('202201-divvy-tripdata.csv')
+Feb22<-read.csv('202202-divvy-tripdata.csv')
+Mar22<-read.csv('202203-divvy-tripdata.csv')
+Apr22<-read.csv('202204-divvy-tripdata.csv')
+May22<-read.csv('202205-divvy-tripdata.csv')
+Jun22<-read.csv('202206-divvy-tripdata.csv')
+Jul22<-read.csv('202207-divvy-tripdata.csv')
+Aug22<-read.csv('202208-divvy-tripdata.csv')
+Sep22<-read.csv('202209-divvy-publictripdata.csv')
+Oct22<-read.csv('202210-divvy-tripdata.csv')
+```
+##Preparing the Data: Merge, View and Clean
+
+
+###Merge Datasets
+
+```{r merging 12 months of data}
+rider_data<-bind_rows(Nov21, Dec21, Jan22, Feb22, Mar22, Apr22, May22, Jun22, Jul22, Aug22, Sep22, Oct22)
+```
+
+###Viewing the Data Using Skimr
+
+```{r skim the new data frame}
+skim(rider_data)
+
+```
+
+
+##Process the Data: Group and Summarize:
+
+###Understanding Rider Preferences
+```{r grouping by membership and week day}
+Num_of_rides_group<-rider_data%>%
+    group_by(member_casual) %>%
+    summarize(num_of_rides = n(), percentage = round(n()/nrow(rider_data),2)*100) %>%
+    arrange(-num_of_rides)
+
+Week_day_group<-rider_data%>%
+    group_by(day_of_week) %>%
+    summarize(week_day = n(), percentage = round(n()/nrow(rider_data),2)*100) %>%
+    arrange(-week_day)
+###Viewing the dataframes
+
+```{r}
+View(Num_of_rides_group)
+View(Week_day_group)
+##Sharing Data: Making Plots with R
+
+###Plotting the Data
+
+```{r plot data}
+options(repr.plot.width = 12, repr.plot.height = 6)
+rider_data %>%
+    group_by(day_of_week, member_casual) %>%
+    summarize(num_of_trips = n(), .groups = "drop") %>%
+    ggplot(mapping = aes(x = day_of_week, y = num_of_trips, color = member_casual)) + geom_line() +
+    geom_point(mapping = aes(x = day_of_week, y = num_of_trips)) +
+    theme(text = element_text(size = 20)) +
+    labs(title = "Bike Rider Data", x = "Day_Of_Week", y = "Num_of_Trips")
+```
+###Acting on Data Based Decisions
+
+Based on the plotted data, it is clear the most casual riders are using the bikes on Saturdays and Sundays. Also, by grouping the number of rides by their status - member or casual
+we can deduce that the difference in the amount of riders is minimal. This means there are just as many casual riders as there are riders with annual memberships. 
+
+
+##Summary: 
+Using Excel and RConsole to clean and share the data was an effective strategy to 
+create the most accurate analysis for shareholders. Cyclistic now has an opportunity to market annual memberships for the price of weekend passes to casual riders. 
